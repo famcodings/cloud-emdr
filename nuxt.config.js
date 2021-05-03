@@ -11,13 +11,40 @@ export default {
     htmlAttrs: {
       lang: 'en'
     },
+    bodyAttrs:{
+      id: 'component-page',
+    },
     meta: [
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { hid: 'description', name: 'description', content: '' }
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      {
+        rel: 'stylesheet',
+        href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap',
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://bulkit.cssninja.io/assets/css/app.css',
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://bulkit.cssninja.io/assets/css/core.css',
+      },
+    ],
+    script: [
+      {
+        type: 'text/javascript',
+        src: '/js/app.js',
+        defer: true,
+      },
+      {
+        type: 'text/javascript',
+        src: '/js/core.js',
+        defer: true,
+      },
     ]
   },
 
@@ -27,6 +54,7 @@ export default {
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
   plugins: [
+    '~/plugins/dot.js'
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components

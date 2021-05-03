@@ -1,73 +1,50 @@
 <template>
-  <div class="container">
-    <div>
-      <Logo />
-      <h1 class="title">
-        cloudemdr-nuxt
-      </h1>
-      <div class="links">
-        <a
-          href="https://nuxtjs.org/"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--green"
-        >
-          Documentation
-        </a>
-        <a
-          href="https://github.com/nuxt/nuxt.js"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="button--grey"
-        >
-          GitHub
-        </a>
-      </div>
+  <div class="is-relative">
+    <Navbar/>
+    <div class="container is-fluid is-fullhd">
+        <div class="columns">
+            <div v-if="isSettingsOpen" class="column is-one-third">
+                <Settings/>
+            </div>
+            <div id="dot-container" class="column is-relative" style="height: calc(100vh - 73.5px); width: 100wh">
+                <Dot/>
+            </div>
+        </div>
+    </div>
+    <div v-if="!isSettingsOpen" class="floating-container info-block">
+        <button class="button primary-btn" @click="toggleStartDotMove">{{isDotMoving?'Stop':'Start'}}</button>
+        <button class="button" @click="setIsSettingOpen(!isSettingsOpen)"><i class="fa fa-cog"></i></button >
     </div>
   </div>
 </template>
 
 <script>
-export default {}
+import { mapState, mapMutations, mapActions  } from 'vuex'
+import Navbar from '@/components/layout/Navbar.vue'
+import Settings from '@/components/Settings.vue'
+import Dot from '@/components/Dot.vue'
+export default {
+    components: {Navbar,Settings, Dot},
+   
+    computed: {
+        ...mapState(['isSettingsOpen', 'isDotMoving'])
+    },
+    methods: {
+        ...mapMutations({
+            setIsSettingOpen: 'SET_IS_SETTING_OPEN',
+        }),
+        ...mapActions({
+            toggleStartDotMove: 'toggleStartDotMove',
+        }),
+    },
+}
 </script>
 
-<style>
-.container {
-  margin: 0 auto;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-
-.title {
-  font-family:
-    'Quicksand',
-    'Source Sans Pro',
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Roboto,
-    'Helvetica Neue',
-    Arial,
-    sans-serif;
-  display: block;
-  font-weight: 300;
-  font-size: 100px;
-  color: #35495e;
-  letter-spacing: 1px;
-}
-
-.subtitle {
-  font-weight: 300;
-  font-size: 42px;
-  color: #526488;
-  word-spacing: 5px;
-  padding-bottom: 15px;
-}
-
-.links {
-  padding-top: 15px;
-}
+<style lang="scss" scoped>
+    .floating-container{
+        margin-bottom: 0px;
+        position: absolute;
+        bottom: 1rem;
+        left: 1rem;
+    }
 </style>
