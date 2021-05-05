@@ -1,12 +1,12 @@
 <template>
   <div class="is-relative">
     <Navbar/>
-    <div class="container is-fluid is-fullhd">
+    <div class="container is-fluid is-fullhd" :class="{'p-0': !isSettingsOpen, 'pr-0': isSettingsOpen}">
         <div class="columns">
-            <div v-if="isSettingsOpen" class="column is-one-third">
+            <div v-if="isSettingsOpen" class="column is-one-third pr-0">
                 <Settings/>
             </div>
-            <div id="dot-container" class="column is-relative" style="height: calc(100vh - 73.5px); width: 100wh">
+            <div id="dot-container" class="column is-relative mt-3" :style="`background:${background}`">
                 <Dot/>
             </div>
         </div>
@@ -27,14 +27,12 @@ export default {
     components: {Navbar,Settings, Dot},
    
     computed: {
-        ...mapState(['isSettingsOpen', 'isDotMoving'])
+        ...mapState(['isSettingsOpen', 'isDotMoving', 'background'])
     },
     methods: {
-        ...mapMutations({
-            setIsSettingOpen: 'SET_IS_SETTING_OPEN',
-        }),
         ...mapActions({
             toggleStartDotMove: 'toggleStartDotMove',
+            setIsSettingOpen: 'setIsSettingOpen',
         }),
     },
 }
@@ -46,5 +44,13 @@ export default {
         position: absolute;
         bottom: 1rem;
         left: 1rem;
+    }
+    #dot-container{
+        height: calc(100vh - 60.5px);
+        width: 100wh;
+        z-index: -1;
+        background-repeat: no-repeat !important;
+        background-size: cover !important;
+        background-position: center !important;
     }
 </style>

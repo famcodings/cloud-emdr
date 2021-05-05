@@ -4,13 +4,13 @@
             Controls
         </h3>
         <p class="pb-2">
-            The controls will disappear when you press Start. If you click the <i class="fa fa-cog"></i> below it will appear again. <a href="https://docs.cloudemdr.com/guides/video-call.html">How to use this in a Video Call?</a>
+            The controls will disappear when you press Start. If you click the <i class="fa fa-cog"></i> below it will appear again.
         </p>
 
         <span class="has-text-weight-medium">Speed</span>
         <div class="field">
             <div class="control">
-                <input class="slider is-fullwidth is-small is-info" step="1" min="1" max="2900" :value="dotSpeed" type="range"  @input="handleSpeedInput">
+                <input class="slider is-fullwidth is-small is-info" step="5" min="180" max="7000" :value="dotSpeed" type="range"  @input="handleSpeedInput">
             </div>
         </div>
 
@@ -24,7 +24,7 @@
         <div class="field">
             <div class="control">
                 <label class="checkbox-wrap is-medium pl-0">
-                    <input id="check2" type="checkbox" class="d-checkbox">
+                    <input v-model="colorChangingDotValue" @change="handleColorChangingDotValueChange" type="checkbox" class="d-checkbox">
                     <span></span>
                     Color Changing Dot
                 </label>
@@ -35,9 +35,9 @@
         <div class="field">
             <div class="control">
                 <div class="select is-medium is-fullwidth">
-                    <select>
-                        <option value="light">Light Background</option>
-                        <option value="dark">Dark Background</option>
+                    <select v-model="backgroundValue" @change="setBackground(backgroundValue)">
+                        <option value="#fff">Light Background</option>
+                        <option value="#333333">Dark Background</option>
                         <option value="practice"> Therapy Practice </option>
                         <option value="forrest"> Forrest </option>
                         <option value="mountains"> Mountains </option>
@@ -57,9 +57,9 @@
                         <option value="emdr-linear">Linear Dot Movement</option>
                         <option value="emdr-non-linear"> 8-shape Dot Movement </option>
                         <option value="random"> Random </option>
-                        <option value="diamond" disabled="disabled"> Diamond (pro users only) </option>
-                        <option value="diagonal" disabled="disabled"> Diagonal (pro users only) </option>
-                        <option value="diagonal-flipped" disabled="disabled"> Diagonal Flipped (pro users only) </option>
+                        <option value="diamond"> Diamond </option>
+                        <option value="diagonal"> Diagonal </option>
+                        <option value="diagonal-flipped"> Diagonal Flipped </option>
                     </select>
                 </div>
             </div>
@@ -94,19 +94,37 @@ export default {
     name: 'Settings',
     data: () => ({
         dotMovementValue: 'emdr-linear',
+        backgroundValue: '#fff',
+        colorChangingDotValue: false,
     }),
     computed: {
-        ...mapState(['isSettingsOpen', 'dotSize', 'dotSpeed', 'isDotMoving'])
+        ...mapState(['isSettingsOpen', 'dotSize', 'dotSpeed', 'isDotMoving', 'dotMovement', 'colorChangingDot'])
+    },
+    watch:{
+        dotMovement:{
+            immediate: true, 
+            handler(){
+                this.dotMovementValue = this.dotMovement
+            },
+        },
+        colorChangingDot:{
+            immediate: true, 
+            handler(){
+                this.colorChangingDotValue = this.colorChangingDot
+            },
+        },
     },
     methods: {
         ...mapMutations({
-            setIsSettingOpen: 'SET_IS_SETTING_OPEN',
             setDotSize: 'SET_DOT_SIZE',
         }),
         ...mapActions({
             setDotSpeed: 'setDotSpeed',
             toggleStartDotMove: 'toggleStartDotMove',
             setDotMovement: 'setDotMovement',
+            setBackground: 'setBackground',
+            setIsSettingOpen: 'setIsSettingOpen',
+            toggleColorChangingDot: 'toggleColorChangingDot',
         }),
         handleSizeInput(event){
             const newDotSize = event.target.value
@@ -116,10 +134,13 @@ export default {
         },
         handleSpeedInput(event){
             const newDotSpeed = event.target.value
-            if(newDotSpeed >= 1 && newDotSpeed <= 2900){
+            if(newDotSpeed >= 0 && newDotSpeed <= 7000){
                 this.setDotSpeed(newDotSpeed)
             }
-        }
+        },
+        handleColorChangingDotValueChange(){
+            this.toggleColorChangingDot(this.colorChangingDotValue)
+        },
     },
 }
 </script>

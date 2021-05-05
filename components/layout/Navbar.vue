@@ -4,7 +4,8 @@
             <!-- Brand -->
             <div class="navbar-brand">
                 <a class="navbar-item" href="/">
-                    <img class="switcher-logo" src="https://cloudemdr.com/img/logo.7b722f80.png" alt="">
+                    <h1 class="is-size-1">EMDR</h1><sub>(Eye Movement Desensitization and Reprocessing)</sub>
+                    <!-- <img class="switcher-logo" src="https://cloudemdr.com/img/logo.7b722f80.png" alt=""> -->
                 </a>
             </div>
             <!-- Navbar menu -->

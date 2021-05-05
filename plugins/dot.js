@@ -8,15 +8,42 @@ export default ({ app, store }, inject) => {
         this.$dot = obj;
         this.$dotContainer = container;
         this.containerIsWindow = container === window;
-        this.pixelsPerSecond = 550;
-        this.currentPosition = { x: 0, y: 0 };
+        this.pixelsPerSecond = 250;
+        this.currentPosition = { x: 0, y: 20 };
         this.isRunning = false;
         this.movementMode = 'emdr-linear'
+        this.jQueryAnimation = null
     }
 
     // Set the speed of movement in Pixels per Second.
     Dot.prototype.setMovementMode = function(mode) {
         this.movementMode = mode;
+        this.resetPosition()
+    }
+
+    Dot.prototype.resetPosition = function() {
+        // const { availableHeight, availableWidth} = this._getContainerDimensions()
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
+        if(this.movementMode === 'emdr-non-linear' || this.movementMode === 'diagonal-flipped'){
+            this.currentPosition = {x: 0, y: 20}
+        }else if(this.movementMode === 'diamond'){
+            this.currentPosition = {x: Math.floor(availableWidth/2), y: 20}
+        }else if(this.movementMode === 'diagonal'){
+            this.currentPosition = {x: 0, y: availableHeight}
+        }else if(this.movementMode === 'emdr-linear'){
+            this.currentPosition = {x: 0, y: Math.floor(availableHeight/2)}
+        }
+        $(this.$dot).css({left:`${this.currentPosition.x}px`, top: `${this.currentPosition.y}px`})
+    }
+
+    Dot.prototype._getContainerDimensions = function() {
+        const containerSize = this._getContainerSize();
+        const availableHeight = containerSize.height - this.$dot.clientHeight - 20;
+        const availableWidth = containerSize.width - this.$dot.clientHeight - 20;
+        return {
+            availableHeight,
+            availableWidth,
+        }
     }
 
     // Set the speed of movement in Pixels per Second.
@@ -31,48 +58,163 @@ export default ({ app, store }, inject) => {
             return { 'height' : this.$dotContainer.clientHeight, 'width' : this.$dotContainer.clientWidth };
        }
     }
-    
-    Dot.prototype._getNewLocation = function() {
-    
-        // Get container dimensions minus div size
-        const containerSize = this._getContainerSize();
-        const availableHeight = containerSize.height - this.$dot.clientHeight;
-        const availableWidth = containerSize.width - this.$dot.clientHeight;
-        // Pick a place in the space
+
+    Dot.prototype._getNext8ShapeLocation = function() {
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
         let x,y = 0
-        if(this.movementMode === 'emdr-linear'){
-            y = Math.floor(availableHeight/2)
-            x = this.currentPosition.x >= availableWidth ? 5 : availableWidth
-        }else if(this.movementMode === 'random'){
-            y = Math.floor(randomIntFromInterval(1,availableHeight));
-            x = Math.floor(randomIntFromInterval(1,availableWidth));
+        if(this.currentPosition.x === 20){
+            if(this.currentPosition.y === 20){
+                x = availableWidth
+                y = availableHeight
+            }
+            if(this.currentPosition.y === availableHeight){
+                x = 20
+                y = 20
+            }
         }
-        console.log('movementMode',this.movementMode)
-        return { x, y };    
+        if(this.currentPosition.x === availableWidth){
+            if(this.currentPosition.y === availableHeight){
+                x = availableWidth
+                y = 20
+            }
+            if(this.currentPosition.y === 20){
+                x = 20
+                y = availableHeight
+            }
+        }
+        
+        if(x === undefined || y === undefined){
+            x = availableWidth
+            y = availableHeight
+        }
+        return {x,y}
+    }
+
+    Dot.prototype._getNextRandomLocation = function() {
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
+        let x,y = 0
+        y = Math.floor(randomIntFromInterval(1,availableHeight));
+        x = Math.floor(randomIntFromInterval(1,availableWidth));
+        return {x,y}
+    }
+
+    Dot.prototype._getNextLinearLocation = function() {
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
+        let x,y = 0
+        y = Math.floor(availableHeight/2)
+        x = this.currentPosition.x >= availableWidth ? 5 : availableWidth
+        return {x,y}
+    }
+
+    Dot.prototype._getNextDiagonalLocation = function() {
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
+        let x,y = 0
+        if(this.currentPosition.x === 20 && this.currentPosition.y === availableHeight){
+            x = availableWidth
+            y = 20
+        }
+        if(this.currentPosition.x === availableWidth && this.currentPosition.y === 20){
+            x = 20
+            y = availableHeight
+        }
+        if(x === undefined || y === undefined){
+            x = 20
+            y = availableHeight
+        }
+        return {x,y}
+    }
+
+    Dot.prototype._getNextDiagonalFlippedLocation = function() {
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
+        let x,y = 0
+        if(this.currentPosition.x === 20 && this.currentPosition.y === 20){
+            x = availableWidth
+            y = availableHeight
+        }
+        if(this.currentPosition.x === availableWidth && this.currentPosition.y === availableHeight){
+            x = 20
+            y = 20
+        }
+        if(x === undefined || y === undefined){
+            x = 20
+            y = 20
+        }
+        return {x,y}
+    }
+
+    Dot.prototype._getNextDiamondLocation = function() {
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
+        let x,y = 0
+        const midY = Math.floor(availableHeight/2)
+        const midX = Math.floor(availableWidth/2)
+        if(this.currentPosition.x === midX && this.currentPosition.y === 20){
+            x = availableWidth
+            y = midY
+        }
+        if(this.currentPosition.x === availableWidth && this.currentPosition.y === midY){
+            x = midX
+            y = availableHeight
+        }
+        if(this.currentPosition.x === midX && this.currentPosition.y === availableHeight){
+            x = 20
+            y = midY
+        }
+        if(this.currentPosition.x === 20 && this.currentPosition.y === midY){
+            x = midX
+            y = 20
+        }
+        if(x === undefined || y === undefined){
+            x = midX
+            y = 20
+        }
+        return {x,y}
     }
     
-    Dot.prototype._calcDelta = function(a, b) {
-        const dx   = a.x - b.x;         
-        const dy   = a.y - b.y;         
-        const dist = Math.sqrt( dx*dx + dy*dy ); 
-        return dist;
+    Dot.prototype._getNewLocation = function() {
+        // Get container dimensions minus div size
+        const { availableHeight, availableWidth} = this._getContainerDimensions()
+        // Pick a place in the space
+        let newLocation = {x:0,y: Math.floor(availableHeight/2)}
+        if(this.movementMode === 'emdr-linear'){
+            newLocation = this._getNextLinearLocation()
+        }else if(this.movementMode === 'random'){
+           newLocation = this._getNextRandomLocation()
+        }else if(this.movementMode === 'emdr-non-linear'){
+            newLocation = this._getNext8ShapeLocation()
+        }else if(this.movementMode === 'diamond'){
+            newLocation = this._getNextDiamondLocation()
+        }else if(this.movementMode === 'diagonal'){
+            newLocation = this._getNextDiagonalLocation()
+        }else if(this.movementMode === 'diagonal-flipped'){
+            newLocation = this._getNextDiagonalFlippedLocation()
+        }
+        return newLocation
     }
     
     Dot.prototype._moveOnce = function() {
         // Pick a new spot on the page
         const next = this._getNewLocation();
-        
-        // How far do we have to move?
-        const delta = this._calcDelta(this.currentPosition, next);
-        
-        // Speed of this transition, rounded to 2DP
-        const speed = Math.round((delta / this.pixelsPerSecond) * 100) / 100;
-        
-        //console.log(this.currentPosition, next, delta, speed);
-              
-        this.$dot.style.transition='transform '+speed+'s linear';
-        this.$dot.style.transform='translate3d('+next.x+'px, '+next.y+'px, 0)';
-        
+        const speed = (5180 - this.pixelsPerSecond) + 2000;
+        // $(this.$dot).css({
+        //     transition: `transform ${speed}s ease-in-out`,
+        //     transform: `translateX(${next.x}px) translateY(${next.y}px) translateZ(0px)`,
+        // })
+        $(this.$dot).animate(
+            {left:`${next.x}px`, top: `${next.y}px`},
+            {
+                speed, //speed in milliseconds 
+                easing: 'swing', //easing
+                start: (animation) => {
+                    this.jQueryAnimation = animation
+                },
+                step: (now, tween) => {
+                    this.jQueryAnimation.duration = 7180 - this.pixelsPerSecond
+                },
+                done: () => {
+                    this._moveOnce();
+                },
+            }
+        )
         // Save this new position ready for the next call.
         this.currentPosition = next;
       
@@ -83,19 +225,13 @@ export default ({ app, store }, inject) => {
         if (this.isRunning) {
             return;
         }
-    
-        // Make sure our object has the right css set
-        this.$dot.willChange = 'transform';
-        this.$dot.pointerEvents = 'auto';
-            
-        this.boundEvent = this._moveOnce.bind(this)
         
-        // Bind callback to keep things moving
-        this.$dot.addEventListener('transitionend', this.boundEvent);
-        
-        // Start it moving
         this._moveOnce();
         
+        // $(this.$dot).on('transitionend webkitTransitionEnd oTransitionEnd', () => {
+        //     this._moveOnce();
+        // });
+
         this.isRunning = true;
     }
     
@@ -105,9 +241,18 @@ export default ({ app, store }, inject) => {
             return;
         }
       
-        this.$dot.removeEventListener('transitionend', this.boundEvent);
-      
         this.isRunning = false;
+
+        // const matrix = $(this.$dot).css('-webkit-transform')
+        // const translate_val = matrix.match(/-?[\d\.]+/g)
+        // this.currentPosition = {x: translate_val[4], y: translate_val[5] }
+        // $(this.$dot).css({
+        //     transform: `translateX(${this.currentPosition.x}px) translateY(${this.currentPosition.y}px) translateZ(0px)`,
+        // })
+        // $(this.$dot).off('transitionend webkitTransitionEnd oTransitionEnd')
+
+        $(this.$dot).clearQueue();
+        $(this.$dot).stop();
     }
 
     const randomIntFromInterval = (min, max) => {
