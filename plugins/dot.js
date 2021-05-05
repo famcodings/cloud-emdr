@@ -25,13 +25,13 @@ export default ({ app, store }, inject) => {
         // const { availableHeight, availableWidth} = this._getContainerDimensions()
         const { availableHeight, availableWidth} = this._getContainerDimensions()
         if(this.movementMode === 'emdr-non-linear' || this.movementMode === 'diagonal-flipped'){
-            this.currentPosition = {x: 0, y: 20}
+            this.currentPosition = {x: 20, y: 20}
         }else if(this.movementMode === 'diamond'){
             this.currentPosition = {x: Math.floor(availableWidth/2), y: 20}
         }else if(this.movementMode === 'diagonal'){
-            this.currentPosition = {x: 0, y: availableHeight}
+            this.currentPosition = {x: 20, y: availableHeight}
         }else if(this.movementMode === 'emdr-linear'){
-            this.currentPosition = {x: 0, y: Math.floor(availableHeight/2)}
+            this.currentPosition = {x: 20, y: Math.floor(availableHeight/2)}
         }
         $(this.$dot).css({left:`${this.currentPosition.x}px`, top: `${this.currentPosition.y}px`})
     }
@@ -102,7 +102,7 @@ export default ({ app, store }, inject) => {
         const { availableHeight, availableWidth} = this._getContainerDimensions()
         let x,y = 0
         y = Math.floor(availableHeight/2)
-        x = this.currentPosition.x >= availableWidth ? 5 : availableWidth
+        x = this.currentPosition.x >= availableWidth ? 20 : availableWidth
         return {x,y}
     }
 

@@ -59,7 +59,6 @@ export const actions = {
     },
     toggleColorChangingDot({commit, state, dispatch}, value) {
         commit('SET_COLOR_CHANGING_DOT', value)
-        console.log('value', value)
         if(value){
             let colorIndex = 0// Math.floor(Math.random() * (3 - 0 + 1)) + 0;
             const interval = setInterval(() => {
@@ -86,11 +85,12 @@ export const actions = {
         }
     },
     setBackground ({commit, dispatch}, value) {
-        dispatch('autoAdjustDotColor')
         if(value === '#fff' || value === '#333333'){
             commit('SET_BACKGROUND', value)
+            dispatch('autoAdjustDotColor')
             return
         }
+        dispatch('autoAdjustDotColor')
         commit('SET_BACKGROUND', `url(/img/${value}.jpg)`)
     },
     toggleStartDotMove ({commit, state}) {
