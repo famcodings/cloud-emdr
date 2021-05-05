@@ -86,12 +86,12 @@ export const actions = {
         }
     },
     setBackground ({commit, dispatch}, value) {
+        dispatch('autoAdjustDotColor')
         if(value === '#fff' || value === '#333333'){
             commit('SET_BACKGROUND', value)
             return
         }
         commit('SET_BACKGROUND', `url(/img/${value}.jpg)`)
-        dispatch('autoAdjustDotColor')
     },
     toggleStartDotMove ({commit, state}) {
         commit('SET_IS_DOT_MOVING', !state.isDotMoving)
