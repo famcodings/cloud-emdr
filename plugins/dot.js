@@ -8,11 +8,12 @@ export default ({ app, store }, inject) => {
         this.$dot = obj;
         this.$dotContainer = container;
         this.containerIsWindow = container === window;
-        this.pixelsPerSecond = 250;
+        this.dotSpeed = 250;
         this.currentPosition = { x: 0, y: 20 };
         this.isRunning = false;
         this.movementMode = 'emdr-linear'
         this.jQueryAnimation = null
+        this.directionDuringLinearMovement = 'right'
     }
 
     // Set the speed of movement in Pixels per Second.
@@ -48,7 +49,7 @@ export default ({ app, store }, inject) => {
 
     // Set the speed of movement in Pixels per Second.
     Dot.prototype.setSpeed = function(pxPerSec) {
-        this.pixelsPerSecond = pxPerSec;
+        this.dotSpeed = pxPerSec;
     }
     
     Dot.prototype._getContainerSize = function() {
@@ -194,7 +195,7 @@ export default ({ app, store }, inject) => {
     Dot.prototype._moveOnce = function() {
         // Pick a new spot on the page
         const next = this._getNewLocation();
-        const speed = (5180 - this.pixelsPerSecond) + 2000;
+        const speed = (1200 - this.dotSpeed)
         // $(this.$dot).css({
         //     transition: `transform ${speed}s ease-in-out`,
         //     transform: `translateX(${next.x}px) translateY(${next.y}px) translateZ(0px)`,
@@ -202,16 +203,37 @@ export default ({ app, store }, inject) => {
         $(this.$dot).animate(
             {left:`${next.x}px`, top: `${next.y}px`},
             {
-                speed, //speed in milliseconds 
+                duration: speed, //speed in milliseconds 
                 easing: 'swing', //easing
                 start: (animation) => {
                     this.jQueryAnimation = animation
                 },
                 step: (now, tween) => {
-                    this.jQueryAnimation.duration = 7180 - this.pixelsPerSecond
+                    const newSpeed = 1200 - (this.dotSpeed)
+                    const reducerPercentage = 0.25
+                    this.jQueryAnimation.duration =  newSpeed - (this.dotSpeed*reducerPercentage)
+
+                    const { availableWidth } = this._getContainerDimensions()
+                    if(tween.prop === 'left'){
+                        if(tween.end > availableWidth){
+                            tween.end = availableWidth-20
+                        }
+                        if(tween.end < availableWidth){
+                            if(next.x !== 20 && next.x < availableWidth){
+                                // console.log(tween.end, availableWidth)
+                                console.log('duration', this.jQueryAnimation.duration)
+                                this.jQueryAnimation.duration = 0//this.jQueryAnimation.duration - 500
+                                console.log('new duration', this.jQueryAnimation.duration)
+                                tween.end = availableWidth // -20-20
+                            }
+                        }
+                    }
+                    // console.log(tween);
                 },
                 done: () => {
-                    this._moveOnce();
+                    this._moveOnce()
+                    if(this.movementMode === 'emdr-linear')
+                        this.directionDuringLinearMovement = this.directionDuringLinearMovement === 'left'? 'right' : 'left'
                 },
             }
         )

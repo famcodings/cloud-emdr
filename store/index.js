@@ -1,8 +1,8 @@
 export const state = () => ({
     isSettingsOpen: true,
     dot: null,
-    dotSize: 40,
-    dotSpeed: 1000,
+    dotSize: 60,
+    dotSpeed: 400,
     dotMovement: 'emdr-linear',
     isDotMoving: false,
     background: '#fff',
@@ -71,36 +71,40 @@ export const actions = {
         }else{
             clearInterval(state.interval)
         }
-        dispatch('autoAdjustDotColor')
+        dispatch('autoAdjustDotColor', state.background)
     },
-    autoAdjustDotColor({commit, state}){
-        if(state.background === '#fff'){
+    autoAdjustDotColor({commit}, backgroundColor){
+        console.log(backgroundColor)
+        if(backgroundColor === '#fff'){
             commit('SET_DOT_COLOR', '#333333')
-        } else if(state.background === '#333333'){
+        } else if(backgroundColor === '#333333'){
             commit('SET_DOT_COLOR', '#cccccc')
-        } else if(state.background === 'url(/img/hospital.jpg)'){
+        } 
+        else if(backgroundColor === 'hospital'){
             commit('SET_DOT_COLOR', '#333333')
-        } else {
+        } 
+        else {
             commit('SET_DOT_COLOR', '#cccccc')
         }
     },
     setBackground ({commit, dispatch}, value) {
-        if(value === '#fff' || value === '#333333'){
+        if(value === '#fff' || value === '#333333')
             commit('SET_BACKGROUND', value)
-            dispatch('autoAdjustDotColor')
-            return
-        }
-        dispatch('autoAdjustDotColor')
-        commit('SET_BACKGROUND', `url(/img/${value}.jpg)`)
+        else
+            commit('SET_BACKGROUND', `url(/img/${value}.jpg)`)
+        dispatch('autoAdjustDotColor', value) 
     },
-    toggleStartDotMove ({commit, state}) {
+    async toggleStartDotMove ({commit, state, dispatch}) {
         commit('SET_IS_DOT_MOVING', !state.isDotMoving)
-        if(state.isSettingsOpen)
-            commit('SET_IS_SETTING_OPEN', false)
+        if(state.isSettingsOpen && state.isDotMoving)
+            await dispatch('setIsSettingOpen', false)
         if(state.isDotMoving){
             this.$getDot().start()
         }else{
             this.$getDot().stop()
         }
     },
+    setIsSettingOpen({commit}, value){
+        commit('SET_IS_SETTING_OPEN', value)
+    }
 }

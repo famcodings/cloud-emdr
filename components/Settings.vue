@@ -10,7 +10,7 @@
         <span class="has-text-weight-medium">Speed</span>
         <div class="field">
             <div class="control">
-                <input class="slider is-fullwidth is-small is-info" step="5" min="180" max="7000" :value="dotSpeed" type="range"  @input="handleSpeedInput">
+                <input class="slider is-fullwidth is-small is-info" step="5" min="300" max="900" :value="dotSpeed" type="range"  @input="handleSpeedInput">
             </div>
         </div>
 
@@ -134,7 +134,7 @@ export default {
         },
         handleSpeedInput(event){
             const newDotSpeed = event.target.value
-            if(newDotSpeed >= 0 && newDotSpeed <= 7000){
+            if(newDotSpeed >= 300 && newDotSpeed <= 900){
                 this.setDotSpeed(newDotSpeed)
             }
         },
