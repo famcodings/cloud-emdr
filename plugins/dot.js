@@ -219,16 +219,12 @@ export default ({ app, store }, inject) => {
                             tween.end = availableWidth-20
                         }
                         if(tween.end < availableWidth){
-                            if(next.x !== 20 && next.x < availableWidth){
-                                // console.log(tween.end, availableWidth)
-                                console.log('duration', this.jQueryAnimation.duration)
+                            if(this.movementMode !== 'random' && this.movementMode !== 'diamond' && next.x !== 20 && next.x < availableWidth){
                                 this.jQueryAnimation.duration = 0//this.jQueryAnimation.duration - 500
-                                console.log('new duration', this.jQueryAnimation.duration)
                                 tween.end = availableWidth // -20-20
                             }
                         }
                     }
-                    // console.log(tween);
                 },
                 done: () => {
                     this._moveOnce()
